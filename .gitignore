@@ -1,0 +1,15 @@
+/node_modules/
+/lib/
+/test/
+custom-elements.json
+# top level source
+fbauth-element.js
+fbauth-element.js.map
+fbauth-element.d.ts
+fbauth-element.d.ts.map
+# only generated for size check
+fbauth-element.bundled.js
+# controversial move:
+package-lock.json
+.DS_Store
+bun.lockb
