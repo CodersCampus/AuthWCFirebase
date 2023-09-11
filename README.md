@@ -2,6 +2,15 @@
 
 Also named AuthWCFirebase
 
+## Cutting to the chase: How to implement on your html page.
+
+1. find `fbauth-element.bundled.js` and place in the appropriate location such as, in a spring web project in `src/main/resources/static/` folder. You should find this file in the `/dev` folder.
+2. point to the above file in your html page, such as with this import statement `<script type="module" src="./fbauth-element.bundled.js"></script>` same as any css or js file, in terms of relative path.
+3. place this element on your html page like so, typically after the `<body>` tag `<fbauth-element></fbauth-element>`
+4. now, move any html you wish protected (most of it?) between `<fbauth-element>` and `</fbauth-element>`
+
+Yup, that's it.
+
 ## Disclaimers and Pre-Reqs
 
 This project is not a part of the coderscampus bootcamp curriculum.
