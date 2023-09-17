@@ -12,5 +12,4 @@ fbauth-element.bundled.js
 # controversial move:
 package-lock.json
 .DS_Store
-bun.lockb
-firebase/config.*
+bun.lockb 
