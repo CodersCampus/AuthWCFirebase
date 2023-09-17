@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2019 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
-
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import {
@@ -40,22 +34,39 @@ export class FBAuthElement extends LitElement {
 
 
   override render() {
+
     this.buttonName = this._buttonMessage();
     return html`
       <div>${this._greeting()}</div>
       <hr>
       ${this.isAuthorized ? html`<slot></slot>` : ''}
+      <hr>
       <button @click=${this._onClick} part="button">${this.buttonName}</button>
+      <p>For your coding pleasure, here is the current firebase auth user object:</p>
+      <pre>${JSON.stringify(auth.currentUser, null, 2)}</pre>
     `;
   }
 
+
   private async _initAuth() {
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const currentUser = await auth.currentUser;
+        this.user = currentUser;
+        if (currentUser) {
+          this.isAuthorized = true;
+        }
+      } else {
+        this.isAuthorized = false;
+      }
+    });
     if (!this.isAuthorized) {
       const userCredentials = await signInWithPopup(auth, new GoogleAuthProvider());
       this.user = userCredentials.user;
       this.isAuthorized = true;
       this.message = this._greeting();
     }
+    this.message = this._greeting();
   }
 
   private _buttonMessage() {
