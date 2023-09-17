@@ -8,12 +8,15 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import {
   User, signInWithPopup, GoogleAuthProvider, signOut
-  //   onAuthStateChanged, 
 } from "firebase/auth";
 import { auth } from './firebase/config';
 
+const DEFAULT_MESSAGE = 'Please login. Or, if you are seeing this message on every secured page, you probably have popups blocked. You can unblock them for this entire site and then refresh the page.';
+
+
 @customElement('fbauth-element')
 export class FBAuthElement extends LitElement {
+
   constructor() {
     super();
     this._initAuth();
@@ -27,9 +30,9 @@ export class FBAuthElement extends LitElement {
   `;
 
   @property()
-  message = 'You are not authorized, please login';
+  message = DEFAULT_MESSAGE;
   @property()
-  buttonName = 'Logout';
+  buttonName = 'Login';
   @property({ type: Boolean })
   isAuthorized = false;
   @property({ type: Object })
@@ -37,8 +40,9 @@ export class FBAuthElement extends LitElement {
 
 
   override render() {
+    this.buttonName = this._buttonMessage();
     return html`
-      <div>${this._greeting()}!</div>
+      <div>${this._greeting()}</div>
       <hr>
       ${this.isAuthorized ? html`<slot></slot>` : ''}
       <button @click=${this._onClick} part="button">${this.buttonName}</button>
@@ -54,26 +58,26 @@ export class FBAuthElement extends LitElement {
     }
   }
 
+  private _buttonMessage() {
+    if (this.isAuthorized) { return 'Logout' }
+    return 'Login';
+  }
+
   private _onClick() {
-    if(this.isAuthorized){
-    this._signMeOut();
-    this.buttonName = 'Login';
-    this.isAuthorized = false;
-    } else {  
+    if (this.isAuthorized) {
+      this._signMeOut();
+      this.isAuthorized = false;
+    } else {
       this._initAuth();
-      this.buttonName = 'Logout';
     }
-  } 
+  }
 
   private async _signMeOut() {
     signOut(auth)
       .then(() => {
         this.user = null;
         this.isAuthorized = false;
-        this.message = 'You are not authorized please login';
-        this.buttonName = 'Login';
-        //   notLoggedIn.style.display = "block"; // Show login button
-        //   loggedIn.style.display = "none"; // Hide logout button
+        this.message = DEFAULT_MESSAGE;
       })
       .catch((error) => {
         alert(error);
@@ -82,7 +86,7 @@ export class FBAuthElement extends LitElement {
 
   private _greeting() {
     if (this.user) { return 'Welcome, ' + this.user.displayName }
-    return  'You are not authorized please login';
+    return DEFAULT_MESSAGE;
   }
 }
 

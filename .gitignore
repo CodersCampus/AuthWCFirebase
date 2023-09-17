@@ -13,3 +13,4 @@ fbauth-element.bundled.js
 package-lock.json
 .DS_Store
 bun.lockb
+firebase/config.*
