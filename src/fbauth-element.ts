@@ -51,6 +51,7 @@ export class FBAuthElement extends LitElement {
   private async _initAuth() {
     auth.onAuthStateChanged(async (user) => {
       if (user) {
+        alert('You are logged in!');
         const currentUser = await auth.currentUser;
         this.user = currentUser;
         if (currentUser) {
@@ -58,14 +59,12 @@ export class FBAuthElement extends LitElement {
         }
       } else {
         this.isAuthorized = false;
-      }
-    });
-    if (!this.isAuthorized) {
-      const userCredentials = await signInWithPopup(auth, new GoogleAuthProvider());
+        const userCredentials = await signInWithPopup(auth, new GoogleAuthProvider());
       this.user = userCredentials.user;
       this.isAuthorized = true;
       this.message = this._greeting();
-    }
+      }
+    })
     this.message = this._greeting();
   }
 
