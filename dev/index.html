@@ -17,7 +17,7 @@
         <h1 class="rainbow-text">Welcome to the Useless Page</h1>
       </header>
       <section>
-        <h2>A Totally Relevant Quote</h2>
+        <h2 onclick="blah()">A Totally Relevant Quote</h2>
         <blockquote>
           "If the world were a logical place, men would ride side-saddle." - Rita Mae Brown
         </blockquote>
@@ -40,6 +40,13 @@
       </footer>
     </div>
   </fbauth-element>
+  <script>
+    const blah = () => {
+    const fbauth = document.querySelector('fbauth-element');
+    const uid = fbauth.getAttribute('uid');
+    alert("uid is " + uid);
+    }
+  </script>
 </body>
 
 </html>

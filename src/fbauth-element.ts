@@ -6,7 +6,7 @@ import {
 import { auth } from './firebase/config';
 
 const DEFAULT_MESSAGE = 'Please login. Or, if you are seeing this message on every secured page, you probably have popups blocked. You can unblock them for this entire site and then refresh the page.';
-
+const NOT_INITIALIZED = 'Not Initialized';
 
 @customElement('fbauth-element')
 export class FBAuthElement extends LitElement {
@@ -14,6 +14,7 @@ export class FBAuthElement extends LitElement {
   constructor() {
     super();
     this._initAuth();
+    this.message = "foo";
   }
   static override styles = css`
     :host {
@@ -31,6 +32,8 @@ export class FBAuthElement extends LitElement {
   isAuthorized = false;
   @property({ type: Object })
   user: User | null = null;
+  @property({ type: String, reflect: true })
+  uid = NOT_INITIALIZED;
 
 
   override render() {
@@ -51,18 +54,19 @@ export class FBAuthElement extends LitElement {
   private async _initAuth() {
     auth.onAuthStateChanged(async (user) => {
       if (user) {
-        alert('You are logged in!');
         const currentUser = await auth.currentUser;
         this.user = currentUser;
         if (currentUser) {
           this.isAuthorized = true;
+          this.uid = currentUser.uid;
         }
       } else {
         this.isAuthorized = false;
         const userCredentials = await signInWithPopup(auth, new GoogleAuthProvider());
-      this.user = userCredentials.user;
-      this.isAuthorized = true;
-      this.message = this._greeting();
+        this.user = userCredentials.user;
+        this.isAuthorized = true;
+        this.message = this._greeting();
+        this.uid = NOT_INITIALIZED;
       }
     })
     this.message = this._greeting();
