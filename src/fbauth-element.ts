@@ -7,6 +7,8 @@ import { auth } from './firebase/config';
 
 const DEFAULT_MESSAGE = 'Please login. Or, if you are seeing this message on every secured page, you probably have popups blocked. You can unblock them for this entire site and then refresh the page.';
 const NOT_INITIALIZED = 'Not Initialized';
+const SHOW_USER = 'Show Google User Data';
+const HIDE_USER = 'Hide Google User Data';
 
 @customElement('fbauth-element')
 export class FBAuthElement extends LitElement {
@@ -28,6 +30,8 @@ export class FBAuthElement extends LitElement {
   message = DEFAULT_MESSAGE;
   @property()
   buttonName = 'Login';
+  @property()
+  showHideUser = SHOW_USER;
   @property({ type: Boolean })
   isAuthorized = false;
   @property({ type: Object })
@@ -45,8 +49,8 @@ export class FBAuthElement extends LitElement {
       ${this.isAuthorized ? html`<slot></slot>` : ''}
       <hr>
       <button @click=${this._onClick} part="button">${this.buttonName}</button>
-      <p>For your coding pleasure, here is the current firebase auth user object:</p>
-      <pre>${JSON.stringify(auth.currentUser, null, 2)}</pre>
+      <button @click=${this._onShowHideUser} part="button">${this.showHideUser}</button>
+      ${this.showHideUser === HIDE_USER ? html`<br><br><img src="${this.user?.photoURL}"/><pre>${JSON.stringify(this.user, null, 2)}</pre>` : ''}
     `;
   }
 
@@ -83,6 +87,14 @@ export class FBAuthElement extends LitElement {
       this.isAuthorized = false;
     } else {
       this._initAuth();
+    }
+  }
+
+  private _onShowHideUser() {
+    if (this.showHideUser === SHOW_USER) {
+      this.showHideUser = HIDE_USER;
+    } else {
+      this.showHideUser = SHOW_USER;
     }
   }
 
