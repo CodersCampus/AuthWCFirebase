@@ -34,6 +34,8 @@
       <section>
         <h2>Random Image</h2>
         <img src="https://placekitten.com/400/300" alt="A cute kitten because why not?" />
+        <div id="uid">[Not initialized]</div>
+        <div id="display-name">[Not initialized]</div>
       </section>
       <footer>
         <p>This is a collection of absolutely meaningless content for testing purposes. Enjoy the randomness!</p>
@@ -41,11 +43,19 @@
     </div>
   </fbauth-element>
   <script>
-    const blah = () => {
     const fbauth = document.querySelector('fbauth-element');
-    const uid = fbauth.getAttribute('uid');
-    alert("uid is " + uid);
-    }
+    const uid = document.getElementById('uid');
+    const displayName = document.getElementById('display-name');
+    fbauth.addEventListener('user-changed', (event) => {
+      const { newValue } = event.detail;
+      if (newValue) {
+        displayName.innerHTML = newValue.displayName;
+        uid.innerHTML = newValue.uid;
+      } else {
+        displayName.innerHTML = '[no user]';
+        uid.innerHTML = '[no user]';
+      }
+    });
   </script>
 </body>
 
