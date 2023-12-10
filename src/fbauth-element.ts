@@ -6,7 +6,6 @@ import {
 import { auth } from './firebase/config';
 
 const DEFAULT_MESSAGE = 'Please login. Or, if you are seeing this message on every secured page, you probably have popups blocked. You can unblock them for this entire site and then refresh the page.';
-const NOT_INITIALIZED = 'Not Initialized';
 const SHOW_USER = 'Show Google User Data';
 const HIDE_USER = 'Hide Google User Data';
 
@@ -16,13 +15,11 @@ export class FBAuthElement extends LitElement {
   constructor() {
     super();
     this._initAuth();
-    this.message = "foo";
+    this.message = DEFAULT_MESSAGE;
   }
   static override styles = css`
     :host {
-      display: block;
       padding: 16px;
-      max-width: 800px;
     }
   `;
 
@@ -36,8 +33,6 @@ export class FBAuthElement extends LitElement {
   isAuthorized = false;
   @property({ type: Object })
   user: User | null = null;
-  @property({ type: String, reflect: true })
-  uid = NOT_INITIALIZED;
 
 
   override render() {
@@ -54,6 +49,18 @@ export class FBAuthElement extends LitElement {
     `;
   }
 
+  override updated(changedProperties: Map<PropertyKey, unknown>): void {
+    changedProperties.forEach((_oldValue: any, propName: PropertyKey) => {
+      if (propName === 'user') {
+        this.dispatchEvent(new CustomEvent('user-changed', {
+          detail: { newValue: this.user },
+          bubbles: true,
+          composed: true
+        }));
+      }
+    });
+  }
+
 
   private async _initAuth() {
     auth.onAuthStateChanged(async (user) => {
@@ -61,8 +68,7 @@ export class FBAuthElement extends LitElement {
         const currentUser = await auth.currentUser;
         this.user = currentUser;
         if (currentUser) {
-          this.isAuthorized = true;
-          this.uid = currentUser.uid;
+          this.isAuthorized = true;         
         }
       } else {
         this.isAuthorized = false;
@@ -70,7 +76,6 @@ export class FBAuthElement extends LitElement {
         this.user = userCredentials.user;
         this.isAuthorized = true;
         this.message = this._greeting();
-        this.uid = NOT_INITIALIZED;
       }
     })
     this.message = this._greeting();
