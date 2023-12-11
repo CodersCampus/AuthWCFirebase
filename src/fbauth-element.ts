@@ -11,6 +11,7 @@ export class FBAuthElement extends LitElement {
 
   constructor() {
     super();
+    console.log('constructor');
     this._initAuth();
   }
   static override styles = css`
@@ -18,36 +19,36 @@ export class FBAuthElement extends LitElement {
       padding: 16px;
     }
     .full-width-div {
-      width: 100%;      /* Full width of the viewport */
-      height: 50px;     /* Height set to 50 pixels */
-      display: flex; /* Enables Flexbox */
-      justify-content: space-between; /* Spreads out the children */
-      align-items: center; /* Aligns items vertically in the center */
-      height: 50px; /* Your desired height */
+      width: 100%;
+      height: 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 50px;
       border-bottom: 1px solid #000;
     }
 
     .full-width-div > div {
-        text-align: center; /* Center the text inside the middle div */
-        flex-grow: 1; /* Allows the middle div to take up the available space */
+        text-align: center;
+        flex-grow: 1;
     }
 
     button {
-      display: flex; /* Enable Flexbox */
-      justify-content: center; /* Center horizontally */
-      align-items: center; /* Center vertically */
-      border-radius: 10px; /* This value can be adjusted as per your design needs */
-      border: 1px solid #ccc; /* Just an example border */
-      padding: 5px 10px; /* Adjust padding as needed */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      padding: 5px 10px;
       cursor: pointer;
     }
     
     .full-screen {
       display: flex;
-      justify-content: center; /* Center horizontally */
-      align-items: center; /* Center vertically */
-      height: 100vh; /* 100% of the viewport height */
-      width: 100vw; /* 100% of the viewport width */
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
     }
 
     .login-button {
@@ -71,7 +72,7 @@ export class FBAuthElement extends LitElement {
       <div class="full-width-div">
         <img height="50" width="50" src="${this.user?.photoURL}"/>
         <h2>${this.user?.displayName}</h2>
-        <button @click=${this._handleLoginClick}>
+        <button @click=${this._handleLogoutClick}>
           <svg xmlns="http://www.w3.org/2000/svg" width="42" height="12" viewBox="0 0 42 12">
             <text x="3" y="10" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.7px;font-family:'DIN Condensed';-inkscape-font-specification:'DIN Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;word-spacing:-0.0211667px;stroke-width:0;stroke-dasharray:none" fill="black">LOGOUT</text>
           </svg>
@@ -102,12 +103,14 @@ export class FBAuthElement extends LitElement {
   private async _initAuth() {
     auth.onAuthStateChanged(async (user) => {
       if (user && this.isAuthorized) {
+        console.log('user is logged in');
         const currentUser = await auth.currentUser;
         this.user = currentUser;
         if (currentUser) {
           this.isAuthorized = true;
         }
       } else {
+        console.log('user is logged in');
         this.isAuthorized = false;
         const userCredentials = await signInWithPopup(auth, new GoogleAuthProvider());
         this.user = userCredentials.user;
@@ -116,8 +119,7 @@ export class FBAuthElement extends LitElement {
     })
   }
 
-  private _handleLoginClick(_event: { altKey: any; }) {
-      // Check if the Alt key was pressed during the click
+  private _handleLogoutClick(_event: { altKey: any; }) {
       if (_event.altKey) {
         if (this.showHideUser ) {
           this.showHideUser = false;
@@ -125,9 +127,9 @@ export class FBAuthElement extends LitElement {
           this.showHideUser = true;
         }
       } else {
-        if (this.isAuthorized) {
+if (this.isAuthorized) {
           this._signMeOut();
-          this.isAuthorized = false;
+this.isAuthorized = false;
         } else {
           this._initAuth();
         }
@@ -140,7 +142,7 @@ export class FBAuthElement extends LitElement {
     signOut(auth)
       .then(() => {
         this.user = null;
-        this.isAuthorized = false;
+this.isAuthorized = false;
       })
       .catch((error) => {
         alert(error);
