@@ -21,6 +21,44 @@ export class FBAuthElement extends LitElement {
     :host {
       padding: 16px;
     }
+    .full-width-div {
+      width: 100%;      /* Full width of the viewport */
+      height: 50px;     /* Height set to 50 pixels */
+      display: flex; /* Enables Flexbox */
+      justify-content: space-between; /* Spreads out the children */
+      align-items: center; /* Aligns items vertically in the center */
+      height: 50px; /* Your desired height */
+      border-bottom: 1px solid #000;
+    }
+
+    .full-width-div > div {
+        text-align: center; /* Center the text inside the middle div */
+        flex-grow: 1; /* Allows the middle div to take up the available space */
+    }
+
+    button {
+      display: flex; /* Enable Flexbox */
+      justify-content: center; /* Center horizontally */
+      align-items: center; /* Center vertically */
+      border-radius: 10px; /* This value can be adjusted as per your design needs */
+      border: 1px solid #ccc; /* Just an example border */
+      padding: 5px 10px; /* Adjust padding as needed */
+      cursor: pointer;
+    }
+    
+    .full-screen {
+      display: flex;
+      justify-content: center; /* Center horizontally */
+      align-items: center; /* Center vertically */
+      height: 100vh; /* 100% of the viewport height */
+      width: 100vw; /* 100% of the viewport width */
+    }
+
+    .login-button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+    }
   `;
 
   @property()
@@ -36,16 +74,22 @@ export class FBAuthElement extends LitElement {
 
 
   override render() {
-
-    this.buttonName = this._buttonMessage();
-    return html`
-      <div>${this._greeting()}</div>
-      <hr>
-      ${this.isAuthorized ? html`<slot></slot>` : ''}
-      <hr>
-      <button @click=${this._onClick} part="button">${this.buttonName}</button>
-      <button @click=${this._onShowHideUser} part="button">${this.showHideUser}</button>
-      ${this.showHideUser === HIDE_USER ? html`<br><br><img src="${this.user?.photoURL}"/><pre>${JSON.stringify(this.user, null, 2)}</pre>` : ''}
+    return this.isAuthorized ? html`
+      <div class="full-width-div">
+        <img height="50" width="50" src="${this.user?.photoURL}"/>
+        <h2>${this.user?.displayName}</h2>
+        <button @click=${this._handleLoginClick}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="42" height="12" viewBox="0 0 42 12">
+            <text x="3" y="10" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.7px;font-family:'DIN Condensed';-inkscape-font-specification:'DIN Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;word-spacing:-0.0211667px;stroke-width:0;stroke-dasharray:none" fill="black">LOGOUT</text>
+          </svg>
+        </button>
+      </div>  
+      ${this.showHideUser === HIDE_USER ? html`<pre>${JSON.stringify(this.user, null, 2)}</pre>` : ''}
+      <slot></slot>
+      ` : html`
+        <div class="full-screen">
+          <button class="login-button">Login</button>
+        </div>
     `;
   }
 
@@ -68,40 +112,35 @@ export class FBAuthElement extends LitElement {
         const currentUser = await auth.currentUser;
         this.user = currentUser;
         if (currentUser) {
-          this.isAuthorized = true;         
+          this.isAuthorized = true;
         }
       } else {
         this.isAuthorized = false;
         const userCredentials = await signInWithPopup(auth, new GoogleAuthProvider());
         this.user = userCredentials.user;
         this.isAuthorized = true;
-        this.message = this._greeting();
       }
     })
-    this.message = this._greeting();
   }
 
-  private _buttonMessage() {
-    if (this.isAuthorized) { return 'Logout' }
-    return 'Login';
+  private _handleLoginClick(_event: { altKey: any; }) {
+      // Check if the Alt key was pressed during the click
+      if (_event.altKey) {
+        if (this.showHideUser === SHOW_USER) {
+          this.showHideUser = HIDE_USER;
+        } else {
+          this.showHideUser = SHOW_USER;
+        }
+      } else {
+        if (this.isAuthorized) {
+          this._signMeOut();
+          this.isAuthorized = false;
+        } else {
+          this._initAuth();
+        }
+      }
   }
 
-  private _onClick() {
-    if (this.isAuthorized) {
-      this._signMeOut();
-      this.isAuthorized = false;
-    } else {
-      this._initAuth();
-    }
-  }
-
-  private _onShowHideUser() {
-    if (this.showHideUser === SHOW_USER) {
-      this.showHideUser = HIDE_USER;
-    } else {
-      this.showHideUser = SHOW_USER;
-    }
-  }
 
   private async _signMeOut() {
     signOut(auth)
@@ -115,10 +154,6 @@ export class FBAuthElement extends LitElement {
       });
   };
 
-  private _greeting() {
-    if (this.user) { return 'Welcome, ' + this.user.displayName }
-    return DEFAULT_MESSAGE;
-  }
 }
 
 declare global {
