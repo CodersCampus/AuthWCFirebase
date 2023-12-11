@@ -5,9 +5,6 @@ import {
 } from "firebase/auth";
 import { auth } from './firebase/config';
 
-const DEFAULT_MESSAGE = 'Please login. Or, if you are seeing this message on every secured page, you probably have popups blocked. You can unblock them for this entire site and then refresh the page.';
-const SHOW_USER = 'Show Google User Data';
-const HIDE_USER = 'Hide Google User Data';
 
 @customElement('fbauth-element')
 export class FBAuthElement extends LitElement {
@@ -15,7 +12,6 @@ export class FBAuthElement extends LitElement {
   constructor() {
     super();
     this._initAuth();
-    this.message = DEFAULT_MESSAGE;
   }
   static override styles = css`
     :host {
@@ -61,12 +57,9 @@ export class FBAuthElement extends LitElement {
     }
   `;
 
-  @property()
-  message = DEFAULT_MESSAGE;
-  @property()
-  buttonName = 'Login';
-  @property()
-  showHideUser = SHOW_USER;
+
+  @property({ type: Boolean })
+  showHideUser = false;
   @property({ type: Boolean })
   isAuthorized = false;
   @property({ type: Object })
@@ -84,7 +77,7 @@ export class FBAuthElement extends LitElement {
           </svg>
         </button>
       </div>  
-      ${this.showHideUser === HIDE_USER ? html`<pre>${JSON.stringify(this.user, null, 2)}</pre>` : ''}
+      ${this.showHideUser  ? html`<pre>${JSON.stringify(this.user, null, 2)}</pre>` : ''}
       <slot></slot>
       ` : html`
         <div class="full-screen">
@@ -108,7 +101,7 @@ export class FBAuthElement extends LitElement {
 
   private async _initAuth() {
     auth.onAuthStateChanged(async (user) => {
-      if (user) {
+      if (user && this.isAuthorized) {
         const currentUser = await auth.currentUser;
         this.user = currentUser;
         if (currentUser) {
@@ -126,10 +119,10 @@ export class FBAuthElement extends LitElement {
   private _handleLoginClick(_event: { altKey: any; }) {
       // Check if the Alt key was pressed during the click
       if (_event.altKey) {
-        if (this.showHideUser === SHOW_USER) {
-          this.showHideUser = HIDE_USER;
+        if (this.showHideUser ) {
+          this.showHideUser = false;
         } else {
-          this.showHideUser = SHOW_USER;
+          this.showHideUser = true;
         }
       } else {
         if (this.isAuthorized) {
@@ -143,11 +136,11 @@ export class FBAuthElement extends LitElement {
 
 
   private async _signMeOut() {
+    this.isAuthorized = false;
     signOut(auth)
       .then(() => {
         this.user = null;
         this.isAuthorized = false;
-        this.message = DEFAULT_MESSAGE;
       })
       .catch((error) => {
         alert(error);
