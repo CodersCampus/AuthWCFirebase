@@ -2,6 +2,8 @@
 
 Also named AuthWCFirebase
 
+here is how I use this daily in dev now `> npm run build && npm run bundle && npx serve`
+
 ## Cutting to the chase: How to implement on your html page.
 
 1. find `fbauth-element.bundled.js` and place in the appropriate location such as, in a spring web project in `src/main/resources/static/` folder. You should find this file in the `/dev` folder.

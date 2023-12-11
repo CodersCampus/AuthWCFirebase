@@ -15,7 +15,7 @@ export class FBAuthElement extends LitElement {
   }
   static override styles = css`
     :host {
-      padding: 16px;
+      padding: 1px;
     }
     .full-width-div {
       width: 100%;
@@ -101,13 +101,15 @@ export class FBAuthElement extends LitElement {
 
   private async _initAuth() {
     auth.onAuthStateChanged(async (user) => {
+      // isAuthorized seems to be a hack to get around the fact that the user is not null and keeps re-logging in
       if (user && this.isAuthorized) {
-        console.log('user is logging in');
+        console.log('LOGGING IN - FOUND USER AND AUTHORIZED');
         const userCredentials = await signInWithPopup(auth, new GoogleAuthProvider());
         this.user = userCredentials.user;
-      } else if (user && !this.isAuthorized) {
-        console.log('some other condition' , user,  this.isAuthorized) ;
-        this._signMeOut()
+      } else if ( !this.isAuthorized) {
+        console.log('NOT AUTHORIZED' , user,  this.isAuthorized) ;
+        // this.user = null;
+        // this._signMeOut()
       }
     })
   }
