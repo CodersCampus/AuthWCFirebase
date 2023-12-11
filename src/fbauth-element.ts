@@ -11,7 +11,6 @@ export class FBAuthElement extends LitElement {
 
   constructor() {
     super();
-    console.log('constructor');
     this._initAuth();
   }
   static override styles = css`
@@ -62,13 +61,13 @@ export class FBAuthElement extends LitElement {
   @property({ type: Boolean })
   showHideUser = false;
   @property({ type: Boolean })
-  isAuthorized = false;
+  isAuthorized = true;
   @property({ type: Object })
   user: User | null = null;
 
 
   override render() {
-    return this.isAuthorized ? html`
+    return this.user ? html`
       <div class="full-width-div">
         <img height="50" width="50" src="${this.user?.photoURL}"/>
         <h2>${this.user?.displayName}</h2>
@@ -82,7 +81,7 @@ export class FBAuthElement extends LitElement {
       <slot></slot>
       ` : html`
         <div class="full-screen">
-          <button class="login-button">Login</button>
+          <button @click=${this._handleLoginClick} class="login-button">Login</button>
         </div>
     `;
   }
@@ -103,23 +102,22 @@ export class FBAuthElement extends LitElement {
   private async _initAuth() {
     auth.onAuthStateChanged(async (user) => {
       if (user && this.isAuthorized) {
-        console.log('user is logged in');
-        const currentUser = await auth.currentUser;
-        this.user = currentUser;
-        if (currentUser) {
-          this.isAuthorized = true;
-        }
-      } else {
-        console.log('user is logged in');
-        this.isAuthorized = false;
+        console.log('user is logging in');
         const userCredentials = await signInWithPopup(auth, new GoogleAuthProvider());
         this.user = userCredentials.user;
-        this.isAuthorized = true;
+      } else if (user && !this.isAuthorized) {
+        console.log('some other condition' , user,  this.isAuthorized) ;
+        this._signMeOut()
       }
     })
   }
 
-  private _handleLogoutClick(_event: { altKey: any; }) {
+  private async _handleLoginClick(){
+    this.isAuthorized = true;
+    const userCredentials = await signInWithPopup(auth, new GoogleAuthProvider());
+    this.user = userCredentials.user;
+  }
+    private _handleLogoutClick(_event: { altKey: any; }) {
       if (_event.altKey) {
         if (this.showHideUser ) {
           this.showHideUser = false;
@@ -127,9 +125,9 @@ export class FBAuthElement extends LitElement {
           this.showHideUser = true;
         }
       } else {
-if (this.isAuthorized) {
+        if (this.isAuthorized) {
           this._signMeOut();
-this.isAuthorized = false;
+          this.isAuthorized = false;
         } else {
           this._initAuth();
         }
@@ -142,7 +140,7 @@ this.isAuthorized = false;
     signOut(auth)
       .then(() => {
         this.user = null;
-this.isAuthorized = false;
+        this.isAuthorized = false;
       })
       .catch((error) => {
         alert(error);
