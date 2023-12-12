@@ -60,8 +60,6 @@ export class FBAuthElement extends LitElement {
 
   @property({ type: Boolean })
   showHideUser = false;
-  @property({ type: Boolean })
-  isAuthorized = true;
   @property({ type: Object })
   user: User | null = null;
 
@@ -101,25 +99,21 @@ export class FBAuthElement extends LitElement {
 
   private async _initAuth() {
     auth.onAuthStateChanged(async (user) => {
-      // isAuthorized seems to be a hack to get around the fact that the user is not null and keeps re-logging in
-      if (user && this.isAuthorized) {
-        console.log('LOGGING IN - FOUND USER AND AUTHORIZED');
+      if (user ) {
+        console.log('LOGGING IN - FOUND USER');
+      } else {
+        console.log('LOGGING OUT - NO USER FOUND');
         const userCredentials = await signInWithPopup(auth, new GoogleAuthProvider());
         this.user = userCredentials.user;
-      } else if ( !this.isAuthorized) {
-        console.log('NOT AUTHORIZED' , user,  this.isAuthorized) ;
-        // this.user = null;
-        // this._signMeOut()
       }
     })
   }
 
   private async _handleLoginClick(){
-    this.isAuthorized = true;
     const userCredentials = await signInWithPopup(auth, new GoogleAuthProvider());
     this.user = userCredentials.user;
   }
-    private _handleLogoutClick(_event: { altKey: any; }) {
+    private async _handleLogoutClick(_event: { altKey: any; }) {
       if (_event.altKey) {
         if (this.showHideUser ) {
           this.showHideUser = false;
@@ -127,22 +121,16 @@ export class FBAuthElement extends LitElement {
           this.showHideUser = true;
         }
       } else {
-        if (this.isAuthorized) {
-          this._signMeOut();
-          this.isAuthorized = false;
-        } else {
-          this._initAuth();
-        }
+          await this._signMeOut();
+          this.user = null;
       }
   }
 
 
   private async _signMeOut() {
-    this.isAuthorized = false;
     signOut(auth)
       .then(() => {
         this.user = null;
-        this.isAuthorized = false;
       })
       .catch((error) => {
         alert(error);
