@@ -12,10 +12,12 @@ import {
 
 
 export const config = {
-    apiKey: "AIzaSyBfKica-6MAXJXJDNY4XMxsktLAIB6u6i4",
-    authDomain: "may2023deleteme.firebaseapp.com",
-    projectId: "may2023deleteme",
-    appId: "1:460858244543:web:e57a049a6211ccb6f0f50a",
+    apiKey: "AIzaSyDIhcIW_rMTpNTldd7H6L22tLAaUUOPZ-w",
+    authDomain: "firewise-pete-c.firebaseapp.com",
+    projectId: "firewise-pete-c",
+    storageBucket: "firewise-pete-c.appspot.com",
+    messagingSenderId: "306688356910",
+    appId: "1:306688356910:web:6c5df20f68fb6add84e5bf"
 };
 
 
