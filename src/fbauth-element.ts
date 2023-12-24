@@ -75,7 +75,7 @@ export class FBAuthElement extends LitElement {
           </svg>
         </button>
       </div>  
-      ${this.showHideUser  ? html`<pre>${JSON.stringify(this.user, null, 2)}</pre>` : ''}
+      ${this.showHideUser ? html`<pre>${JSON.stringify(this.user, null, 2)}</pre>` : ''}
       <slot></slot>
       ` : html`
         <div class="full-screen">
@@ -99,8 +99,10 @@ export class FBAuthElement extends LitElement {
 
   private async _initAuth() {
     auth.onAuthStateChanged(async (user) => {
-      if (user ) {
+      if (user) {
         console.log('LOGGING IN - FOUND USER');
+        const currentUser = await auth.currentUser;
+        this.user = currentUser;
       } else {
         console.log('LOGGING OUT - NO USER FOUND');
         const userCredentials = await signInWithPopup(auth, new GoogleAuthProvider());
@@ -109,21 +111,21 @@ export class FBAuthElement extends LitElement {
     })
   }
 
-  private async _handleLoginClick(){
+  private async _handleLoginClick() {
     const userCredentials = await signInWithPopup(auth, new GoogleAuthProvider());
     this.user = userCredentials.user;
   }
-    private async _handleLogoutClick(_event: { altKey: any; }) {
-      if (_event.altKey) {
-        if (this.showHideUser ) {
-          this.showHideUser = false;
-        } else {
-          this.showHideUser = true;
-        }
+  private async _handleLogoutClick(_event: { altKey: any; }) {
+    if (_event.altKey) {
+      if (this.showHideUser) {
+        this.showHideUser = false;
       } else {
-          await this._signMeOut();
-          this.user = null;
+        this.showHideUser = true;
       }
+    } else {
+      await this._signMeOut();
+      this.user = null;
+    }
   }
 
 
